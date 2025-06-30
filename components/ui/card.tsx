@@ -1,0 +1,1 @@
+export const Component = (props: any) => <div>{props.children}</div>;
