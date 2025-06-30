@@ -1,14 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 
-export default function BoardGamePlanner() {
+import { useState, useEffect } from "react";
+
+export default function Page() {
   const [games, setGames] = useState<string[]>([]);
   const [newGame, setNewGame] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const storedGames = localStorage.getItem("games");
@@ -36,55 +33,48 @@ export default function BoardGamePlanner() {
 
   const clearAll = () => {
     setGames([]);
-    setSelectedDate(undefined);
+    setSelectedDate(null);
     localStorage.clear();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-100 to-purple-200 p-8 font-sans">
-      <h1 className="text-4xl font-bold text-center mb-8 text-purple-900">🎲 Board Game Planner</h1>
+    <div style={{ padding: 20, fontFamily: "sans-serif" }}>
+      <h1>🎲 Board Game Planner</h1>
 
-      <div className="flex justify-center mb-6">
-        <Button variant="destructive" onClick={clearAll}>🗑️ Alles löschen</Button>
+      <button onClick={clearAll} style={{ marginBottom: 10 }}>
+        🗑️ Alles löschen
+      </button>
+
+      <div>
+        <h2>🧩 Spiele-Sammlung</h2>
+        <input
+          value={newGame}
+          onChange={(e) => setNewGame(e.target.value)}
+          placeholder="Neues Spiel hinzufügen"
+        />
+        <button onClick={addGame}>➕ Hinzufügen</button>
+
+        <ul>
+          {games.map((game, idx) => (
+            <li key={idx}>{game}</li>
+          ))}
+        </ul>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        <Card className="shadow-xl">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-800">🧩 Spiele-Sammlung</h2>
-            <div className="flex gap-2 mb-4">
-              <Input
-                value={newGame}
-                onChange={(e) => setNewGame(e.target.value)}
-                placeholder="Neues Spiel hinzufügen"
-              />
-              <Button onClick={addGame}>➕ Hinzufügen</Button>
-            </div>
-            <ul className="list-disc list-inside space-y-1">
-              {games.map((game, idx) => (
-                <li key={idx} className="text-gray-700">{game}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-xl">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-800">📅 Spieleabend planen</h2>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border shadow-sm"
-            />
-            {selectedDate && (
-              <p className="mt-4 text-green-700 font-medium">
-                Nächstes Spieleabend: {selectedDate.toLocaleDateString()}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      <div style={{ marginTop: 20 }}>
+        <h2>📅 Spieleabend planen</h2>
+        <input
+          type="date"
+          value={selectedDate ? selectedDate.toISOString().substring(0, 10) : ""}
+          onChange={(e) => setSelectedDate(e.target.value ? new Date(e.target.value) : null)}
+        />
+        {selectedDate && (
+          <p>
+            Nächstes Spieleabend: {selectedDate.toLocaleDateString()}
+          </p>
+        )}
       </div>
     </div>
   );
 }
+
